@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_OrderProcess"
+                  targetNamespace="http://example.com/bpmn/order-process">
+
+  <bpmn:process id="Process_XuLyDonHang" name="Quy trình xử lý đơn hàng" isExecutable="false">
+
+    <bpmn:startEvent id="StartEvent_1" name="Bắt đầu">
+      <bpmn:outgoing>Flow_Start_TiepNhan</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:task id="Task_TiepNhan" name="Tiếp nhận đơn hàng">
+      <bpmn:incoming>Flow_Start_TiepNhan</bpmn:incoming>
+      <bpmn:outgoing>Flow_TiepNhan_KiemTra</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_KiemTra" name="Kiểm tra tồn kho">
+      <bpmn:incoming>Flow_TiepNhan_KiemTra</bpmn:incoming>
+      <bpmn:outgoing>Flow_KiemTra_Gateway1</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_1" name="Đủ hàng và&#10;thanh toán hợp lệ?">
+      <bpmn:incoming>Flow_KiemTra_Gateway1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Gateway1_XacNhan</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Gateway1_Huy</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="Task_XacNhan" name="Xác nhận thanh toán">
+      <bpmn:incoming>Flow_Gateway1_XacNhan</bpmn:incoming>
+      <bpmn:outgoing>Flow_XacNhan_DongGoi</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_HuyDon" name="Hủy đơn hàng">
+      <bpmn:incoming>Flow_Gateway1_Huy</bpmn:incoming>
+      <bpmn:outgoing>Flow_Huy_EndHuy</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="EndEvent_DaHuy" name="Đã hủy">
+      <bpmn:incoming>Flow_Huy_EndHuy</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:task id="Task_DongGoi" name="Đóng gói hàng">
+      <bpmn:incoming>Flow_XacNhan_DongGoi</bpmn:incoming>
+      <bpmn:outgoing>Flow_DongGoi_GiaoHang</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_GiaoHang" name="Giao hàng">
+      <bpmn:incoming>Flow_DongGoi_GiaoHang</bpmn:incoming>
+      <bpmn:outgoing>Flow_GiaoHang_Gateway2</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_2" name="Khách yêu cầu&#10;trả hàng?">
+      <bpmn:incoming>Flow_GiaoHang_Gateway2</bpmn:incoming>
+      <bpmn:outgoing>Flow_Gateway2_HoanTat</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Gateway2_HoanTra</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:endEvent id="EndEvent_HoanTat" name="Hoàn tất">
+      <bpmn:incoming>Flow_Gateway2_HoanTat</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:task id="Task_HoanTra" name="Hoàn trả hàng">
+      <bpmn:incoming>Flow_Gateway2_HoanTra</bpmn:incoming>
+      <bpmn:outgoing>Flow_HoanTra_EndHoanTra</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="EndEvent_DaHoanTra" name="Đã hoàn trả">
+      <bpmn:incoming>Flow_HoanTra_EndHoanTra</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_Start_TiepNhan" sourceRef="StartEvent_1" targetRef="Task_TiepNhan"/>
+    <bpmn:sequenceFlow id="Flow_TiepNhan_KiemTra" sourceRef="Task_TiepNhan" targetRef="Task_KiemTra"/>
+    <bpmn:sequenceFlow id="Flow_KiemTra_Gateway1" sourceRef="Task_KiemTra" targetRef="Gateway_1"/>
+    <bpmn:sequenceFlow id="Flow_Gateway1_XacNhan" name="Có" sourceRef="Gateway_1" targetRef="Task_XacNhan"/>
+    <bpmn:sequenceFlow id="Flow_Gateway1_Huy" name="Không" sourceRef="Gateway_1" targetRef="Task_HuyDon"/>
+    <bpmn:sequenceFlow id="Flow_Huy_EndHuy" sourceRef="Task_HuyDon" targetRef="EndEvent_DaHuy"/>
+    <bpmn:sequenceFlow id="Flow_XacNhan_DongGoi" sourceRef="Task_XacNhan" targetRef="Task_DongGoi"/>
+    <bpmn:sequenceFlow id="Flow_DongGoi_GiaoHang" sourceRef="Task_DongGoi" targetRef="Task_GiaoHang"/>
+    <bpmn:sequenceFlow id="Flow_GiaoHang_Gateway2" sourceRef="Task_GiaoHang" targetRef="Gateway_2"/>
+    <bpmn:sequenceFlow id="Flow_Gateway2_HoanTat" name="Không" sourceRef="Gateway_2" targetRef="EndEvent_HoanTat"/>
+    <bpmn:sequenceFlow id="Flow_Gateway2_HoanTra" name="Có" sourceRef="Gateway_2" targetRef="Task_HoanTra"/>
+    <bpmn:sequenceFlow id="Flow_HoanTra_EndHoanTra" sourceRef="Task_HoanTra" targetRef="EndEvent_DaHoanTra"/>
+
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_XuLyDonHang">
+
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="102" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_TiepNhan_di" bpmnElement="Task_TiepNhan">
+        <dc:Bounds x="240" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_KiemTra_di" bpmnElement="Task_KiemTra">
+        <dc:Bounds x="390" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_1_di" bpmnElement="Gateway_1">
+        <dc:Bounds x="540" y="95" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_XacNhan_di" bpmnElement="Task_XacNhan">
+        <dc:Bounds x="640" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_DongGoi_di" bpmnElement="Task_DongGoi">
+        <dc:Bounds x="790" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_GiaoHang_di" bpmnElement="Task_GiaoHang">
+        <dc:Bounds x="940" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_2_di" bpmnElement="Gateway_2">
+        <dc:Bounds x="1090" y="95" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_HoanTat_di" bpmnElement="EndEvent_HoanTat">
+        <dc:Bounds x="1192" y="102" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_HuyDon_di" bpmnElement="Task_HuyDon">
+        <dc:Bounds x="515" y="260" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_DaHuy_di" bpmnElement="EndEvent_DaHuy">
+        <dc:Bounds x="547" y="400" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_HoanTra_di" bpmnElement="Task_HoanTra">
+        <dc:Bounds x="1065" y="260" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_DaHoanTra_di" bpmnElement="EndEvent_DaHoanTra">
+        <dc:Bounds x="1097" y="400" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Start_TiepNhan_di" bpmnElement="Flow_Start_TiepNhan">
+        <di:waypoint x="188" y="120"/>
+        <di:waypoint x="240" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TiepNhan_KiemTra_di" bpmnElement="Flow_TiepNhan_KiemTra">
+        <di:waypoint x="340" y="120"/>
+        <di:waypoint x="390" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_KiemTra_Gateway1_di" bpmnElement="Flow_KiemTra_Gateway1">
+        <di:waypoint x="490" y="120"/>
+        <di:waypoint x="540" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Gateway1_XacNhan_di" bpmnElement="Flow_Gateway1_XacNhan">
+        <di:waypoint x="590" y="120"/>
+        <di:waypoint x="640" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Gateway1_Huy_di" bpmnElement="Flow_Gateway1_Huy">
+        <di:waypoint x="565" y="145"/>
+        <di:waypoint x="565" y="260"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Huy_EndHuy_di" bpmnElement="Flow_Huy_EndHuy">
+        <di:waypoint x="565" y="340"/>
+        <di:waypoint x="565" y="400"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_XacNhan_DongGoi_di" bpmnElement="Flow_XacNhan_DongGoi">
+        <di:waypoint x="740" y="120"/>
+        <di:waypoint x="790" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_DongGoi_GiaoHang_di" bpmnElement="Flow_DongGoi_GiaoHang">
+        <di:waypoint x="890" y="120"/>
+        <di:waypoint x="940" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_GiaoHang_Gateway2_di" bpmnElement="Flow_GiaoHang_Gateway2">
+        <di:waypoint x="1040" y="120"/>
+        <di:waypoint x="1090" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Gateway2_HoanTat_di" bpmnElement="Flow_Gateway2_HoanTat">
+        <di:waypoint x="1140" y="120"/>
+        <di:waypoint x="1192" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Gateway2_HoanTra_di" bpmnElement="Flow_Gateway2_HoanTra">
+        <di:waypoint x="1115" y="145"/>
+        <di:waypoint x="1115" y="260"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_HoanTra_EndHoanTra_di" bpmnElement="Flow_HoanTra_EndHoanTra">
+        <di:waypoint x="1115" y="340"/>
+        <di:waypoint x="1115" y="400"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>
